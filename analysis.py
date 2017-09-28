@@ -2,8 +2,6 @@
 
 import psycopg2
 
-DBNAME = "news"
-
 
 def connect(database_name="news"):
     try:
