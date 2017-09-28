@@ -11,7 +11,7 @@ def connect(database_name="news"):
         cursor = db.cursor()
         return db, cursor
     except:
-        print("<error message>")
+        print("error message:couldn't connect to databse")
 
 
 def top_three_articles():
