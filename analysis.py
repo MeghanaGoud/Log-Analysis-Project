@@ -1,16 +1,26 @@
+# !/usr/bin/env python3
+
 import psycopg2
 
 DBNAME = "news"
-db = psycopg2.connect(database=DBNAME)
+
+
+def connect(database_name="news"):
+    try:
+        db = psycopg2.connect("dbname={}".format(database_name))
+        cursor = db.cursor()
+        return db, cursor
+    except:
+        print("<error message>")
 
 
 def top_three_articles():
     print('What are the most popular three articles of all time?')
     cur = db.cursor()
     query_1 = """SELECT articles.title, count(log.path) as \
-                    views from articles, log where \
+                    views FROM articles, log WHERE \
                     log.path=('/article/' || articles.slug)\
-                    group by articles.title order by views desc limit 3"""
+                    GROUP BY articles.title ORDER BY views desc limit 3"""
     cur.execute(query_1)
     data = cur.fetchall()
     for row in data:
@@ -20,11 +30,11 @@ def top_three_articles():
 def popular_authors():
     print('Who are the most popular article authors of all time?')
     cur = db.cursor()
-    query_2 = """SELECT authors.name, count(log.path) as views from\
+    query_2 = """SELECT authors.name, count(log.path) as views FROM\
                  articles, log, authors\
-                 where log.path=('/article/'||articles.slug)\
-                 and articles.author = authors.id \
-                 group by authors.name order by views desc"""
+                 WHERE log.path=('/article/'||articles.slug)\
+                 AND articles.author = authors.id \
+                 GROUP BY authors.name ORDER BY views desc"""
     cur.execute(query_2)
     data = cur.fetchall()
     for row in data:
@@ -36,9 +46,9 @@ def error_percentage():
     cur = db.cursor()
     query_3 = """SELECT to_char(errors.date, 'Month DD, YYYY'),\
                  round((errors.errors*1.0/request.requests*1.0)*100,3)\
-                 as percent from errors, request \
+                 as percent FROM errors, request \
                  WHERE errors.date = request.date
-                 and (errors.errors*1.0 / request.requests*1.0)*100 > 1
+                 AND (errors.errors*1.0 / request.requests*1.0)*100 > 1
                  ORDER BY percent desc; """
     cur.execute(query_3)
     data = cur.fetchall()
@@ -50,3 +60,4 @@ if __name__ == '__main__':
     top_three_articles()
     popular_authors()
     error_percentage()
+
